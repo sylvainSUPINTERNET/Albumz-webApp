@@ -5,13 +5,11 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 
 class DefaultController extends Controller
 {
-
-
-
-
 
 
     /**
@@ -20,17 +18,37 @@ class DefaultController extends Controller
     public function indexAction(Request $request)
     {
 
+
+
+        if($this->getUserConnected()){
+            var_dump($this->getUserRoles());
+        }
+
+
+
+        return $this->render('AppBundle:Home:index.html.twig', array()
+        );
+    }
+
+
+
+
+    //UTILS method
+    public function getUserConnected(){
         $securityContext = $this->container->get('security.authorization_checker');
         if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
-            //User is connected (More than Anonymous)
-
-            var_dump($this->getUser()->getRoles());
-            return $this->render('default/index.html.twig', [
-                'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
-            ]);
+            return $this->getUser();
         }else{
-            //User not connected
-            return $this->redirectToRoute('fos_user_security_login');
+            return false;
+        }
+    }
+
+    public function getUserRoles(){
+        $securityContext = $this->container->get('security.authorization_checker');
+        if ($securityContext->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->getUser()->getRoles();
+        }else{
+            return false;
         }
     }
 }
