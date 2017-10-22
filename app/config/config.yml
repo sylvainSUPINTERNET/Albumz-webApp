@@ -7,6 +7,7 @@ imports:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    app.path.photo: /uploads/photos
 
 framework:
     esi: ~
@@ -18,7 +19,7 @@ framework:
     form: ~
     csrf_protection: ~
     validation: { enable_annotations: true }
-    #serializer: { enable_annotations: true }
+    serializer: { enable_annotations: true }
     templating:
         engines: ['twig']
     default_locale: '%locale%'
@@ -78,13 +79,36 @@ fos_user:
         address: "%mailer_user%"
         sender_name: "%mailer_user%"
 
-# app/config/config.yml
+
+
+
+#uploader config
+vich_uploader:
+    db_driver: orm
+    mappings:
+        photo:
+            uri_prefix:         '%app.path.photo%'
+            upload_destination: '%kernel.root_dir%/../web/uploads/photos'
+
+# easy_admin config
 easy_admin:
     entities:
         - AppBundle\Entity\User
+        - AppBundle\Entity\Photo
 
-# app/config/config.yml
+
 easy_admin:
     entities:
         User:
             class: AppBundle\Entity\User
+        Photo:
+            class: AppBundle\Entity\Photo
+            list:
+                fields:
+                    - { property: 'photo', type: 'image', base_path: '%app.path.photo%' }
+            # ...
+            show:
+                fields:
+                    - { property: 'photo', type: 'image', base_path: '%app.path.photo%' }
+
+
